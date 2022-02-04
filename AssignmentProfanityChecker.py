@@ -32,5 +32,5 @@ elif filename.endswith('.docx') or filename.endswith('.doc'):
     filterDocx()
 elif filename.endswith('.pdf'):
     filterPdf()
-elif filename.endswith('xlsx') or filename.endswith('.xls'):
+elif filename.endswith('xlsx') or filename.endswith('.xls') or filename.endswith('.csv'):
     filterXlsx()
