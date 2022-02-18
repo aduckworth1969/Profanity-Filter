@@ -1,4 +1,5 @@
 import argparse
+# from types import NoneType
 import docx2txt
 from pdfminer.high_level import extract_text
 import openpyxl
@@ -19,9 +20,9 @@ def main():
 def processFileType(filename):
     # if statements to check incoming file for filetype.
     if filename.endswith('.txt'):
-        openFile = open(filename,'r')
-        assignmentText = openFile.read()
-        # print(assignmentText)
+        with open(filename,'r') as openFile:
+            assignmentText = openFile.read()
+            # print(assignmentText)
     elif filename.endswith('.docx') or filename.endswith('.doc'):
         assignmentText = docx2txt.process(filename)
         # print(assignmentText)
@@ -31,9 +32,16 @@ def processFileType(filename):
     elif filename.endswith('xlsx') or filename.endswith('.xls'):
         workBook = openpyxl.load_workbook(filename)
         sheet = workBook.active
-        assignmentText = list(sheet.values)
+        assignmentList = list(sheet.values)
+        assignmentText = []
+        for item in assignmentList:
+            for w in item:
+                assignmentText.append(w)
     elif filename.endswith('.csv'):
-        pass
+        with open(filename, 'r') as openFile:
+            csv_reader = csv.reader(openFile)
+            assignmentText = list(csv_reader)
+            print(assignmentText)
 
     return assignmentText
 
@@ -42,18 +50,29 @@ def checkProfanity(assignmentText):
     with open('WordList.json') as wordList:
         wordListDict = json.load(wordList)
         wordListDictKeys = wordListDict.keys()
-        assignmentTextLower = assignmentText.lower()
-        assignmentTextProcess = assignmentTextLower.split()
         textMatch = []
+        if isinstance(assignmentText,str):
+            assignmentTextLower = assignmentText.lower()
+            assignmentTextProcess = assignmentTextLower.split()
+        elif isinstance(assignmentText,list):
+            assignmentTextProcess = []
+            for item in assignmentText:
+                if isinstance(item,str):
+                    itemLower = item.lower()
+                    assignmentTextProcess.append(itemLower)
+                if isinstance(item,list):
+                    assignmentTextMap = (map(lambda x: x.lower(), item))
+                    # assignmentTextProcess = list(assignmentTextMap)
+                    assignmentTextProcess.append(list(assignmentTextMap))
+            print(assignmentTextProcess)
         for i in assignmentTextProcess:
             for w in wordListDictKeys:
                 if i == w:
                     textMatch.append(i)
-        print(textMatch)
         return textMatch
 
 def evaluateProfanity(profanityCheck):
-    print(len(profanityCheck))
-
+    # print(len(profanityCheck))
+    pass
 if __name__ == '__main__':
     main()
