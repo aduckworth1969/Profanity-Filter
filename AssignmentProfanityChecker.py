@@ -49,8 +49,6 @@ def checkProfanity(assignmentText):
     # opens file with profanity and turns it into a profanity word list.
     with open('WordList.json') as wordList:
         wordListDict = json.load(wordList)
-        wordListDictKeys = wordListDict.keys()
-        textMatch = []
         if isinstance(assignmentText,str):
             assignmentTextLower = assignmentText.lower()
             assignmentTextProcess = assignmentTextLower.split()
@@ -62,13 +60,10 @@ def checkProfanity(assignmentText):
                     assignmentTextProcess.append(itemLower)
                 if isinstance(item,list):
                     assignmentTextMap = (map(lambda x: x.lower(), item))
-                    # assignmentTextProcess = list(assignmentTextMap)
                     assignmentTextProcess.append(list(assignmentTextMap))
             print(assignmentTextProcess)
-        for i in assignmentTextProcess:
-            for w in wordListDictKeys:
-                if i == w:
-                    textMatch.append(i)
+        textMatch = [x for x in assignmentTextProcess if x in wordListDict.keys()]
+        print(textMatch)
         return textMatch
 
 def evaluateProfanity(profanityCheck):
