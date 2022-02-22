@@ -50,8 +50,7 @@ def checkProfanity(assignmentText):
     with open('WordList.json') as wordList:
         wordListDict = json.load(wordList)
         if isinstance(assignmentText,str):
-            assignmentTextLower = assignmentText.lower()
-            assignmentTextProcess = assignmentTextLower.split()
+            assignmentTextProcess = assignmentText.lower().split()
         elif isinstance(assignmentText,list):
             assignmentTextProcess = []
             for item in assignmentText:
