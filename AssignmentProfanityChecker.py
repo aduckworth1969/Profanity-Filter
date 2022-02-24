@@ -1,10 +1,10 @@
 import argparse
-# from types import NoneType
 import docx2txt
 from pdfminer.high_level import extract_text
 import openpyxl
 import csv
 import json
+import string
 
 def main():
     # adds an argument to the program requiring a file name at run.
@@ -15,20 +15,17 @@ def main():
 
     assignmentText = processFileType(filename)
     profanityCheck = checkProfanity(assignmentText)
-    evaluateProfanityResults = evaluateProfanity(profanityCheck)
+    evaluateProfanityResults = evaluateProfanity(profanityCheck,filename)
 
 def processFileType(filename):
     # if statements to check incoming file for filetype.
     if filename.endswith('.txt'):
         with open(filename,'r') as openFile:
             assignmentText = openFile.read()
-            # print(assignmentText)
     elif filename.endswith('.docx') or filename.endswith('.doc'):
         assignmentText = docx2txt.process(filename)
-        # print(assignmentText)
     elif filename.endswith('.pdf'):
         assignmentText = extract_text(filename)
-        # print(assignmentText)
     elif filename.endswith('xlsx') or filename.endswith('.xls'):
         workBook = openpyxl.load_workbook(filename)
         sheet = workBook.active
@@ -40,8 +37,11 @@ def processFileType(filename):
     elif filename.endswith('.csv'):
         with open(filename, 'r') as openFile:
             csv_reader = csv.reader(openFile)
-            assignmentText = list(csv_reader)
-            print(assignmentText)
+            csvTuple = list(csv_reader)
+            assignmentText = []
+            for item in csvTuple:
+                for tupleItem in item:
+                    assignmentText.append(tupleItem)
 
     return assignmentText
 
@@ -60,13 +60,20 @@ def checkProfanity(assignmentText):
                 if isinstance(item,list):
                     assignmentTextMap = (map(lambda x: x.lower(), item))
                     assignmentTextProcess.append(list(assignmentTextMap))
-            print(assignmentTextProcess)
-        textMatch = [x for x in assignmentTextProcess if x in wordListDict.keys()]
-        print(textMatch)
-        return textMatch
+        assignmentTextProcessPunc = [''.join(letter for letter in word if letter not in string.punctuation) for word in assignmentTextProcess]
+        textMatch = [x for x in assignmentTextProcessPunc if x in wordListDict.keys()]
 
-def evaluateProfanity(profanityCheck):
-    # print(len(profanityCheck))
-    pass
+        return wordListDict,textMatch
+
+def evaluateProfanity(profanityCheck,filename):
+    wordListDict = profanityCheck[0]
+    textMatch = profanityCheck[1]
+    dictMatch = []
+
+    for i in textMatch:
+        for k,v in wordListDict.items():
+            if i == k:
+                dictMatch.append(v)
+
 if __name__ == '__main__':
     main()
