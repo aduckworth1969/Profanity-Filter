@@ -5,6 +5,7 @@ import openpyxl
 import csv
 import json
 import string
+from collections import Counter
 
 def main():
     # adds an argument to the program requiring a file name at run.
@@ -42,7 +43,7 @@ def processFileType(filename):
             for item in csvTuple:
                 for tupleItem in item:
                     assignmentText.append(tupleItem)
-
+    
     return assignmentText
 
 def checkProfanity(assignmentText):
@@ -74,6 +75,12 @@ def evaluateProfanity(profanityCheck,filename):
         for k,v in wordListDict.items():
             if i == k:
                 dictMatch.append(v)
+    
+    wordCount = {m:dictMatch.count(m) for m in dictMatch}
+    countDict = '{'+filename+':' +str(wordCount)+'}'
+
+    countDictJson = json.dumps(countDict)
+    print(countDictJson)
 
 if __name__ == '__main__':
     main()
